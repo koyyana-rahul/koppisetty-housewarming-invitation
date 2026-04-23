@@ -307,7 +307,8 @@ export const templates = [
     footer: {
       symbol: "☬",
       message:
-        "Sealed with sacred vows, blessed by two loving families, and guided by Waheguru's grace —\nwe begin our forever with grateful and joyful hearts.\n\nWe cannot wait to celebrate this beautiful chapter with you.",
+        "With the divine blessings of Lord Venkateswara and the love of our families,\nour sacred union is being tied in holy matrimony.\n\nWe begin this new journey together with gratitude and joy,\nand seek your blessings as we step into this auspicious chapter of our lives.\n\nWe warmly invite you to grace the occasion and celebrate with us.",
+      couple: "Ramakrishna & Triveni",
       couple: "RamaKrishna & Triveni",
       creditPrefix: "MADE WITH",
       creditHeart: "♥",
