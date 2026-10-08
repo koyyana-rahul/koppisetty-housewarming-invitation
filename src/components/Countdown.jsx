@@ -4,13 +4,7 @@ function getTimeLeft(target) {
   const diff = target.getTime() - Date.now();
 
   if (diff <= 0) {
-    return {
-      done: true,
-      days: "00",
-      hours: "00",
-      mins: "00",
-      secs: "00",
-    };
+    return { done: true, days: "00", hours: "00", mins: "00", secs: "00" };
   }
 
   const fmt = (n) => String(n).padStart(2, "0");
@@ -24,70 +18,59 @@ function getTimeLeft(target) {
   };
 }
 
-function Countdown({ dateTime }) {
+export default function Countdown({
+  dateTime,
+  eyebrow,
+  script,
+  quote,
+  doneText,
+}) {
   const [time, setTime] = useState(() => getTimeLeft(new Date(dateTime)));
 
   useEffect(() => {
     const target = new Date(dateTime);
-    const timer = setInterval(() => {
-      setTime(getTimeLeft(target));
-    }, 1000);
+    if (Number.isNaN(target.getTime())) return undefined;
 
+    const timer = setInterval(() => setTime(getTimeLeft(target)), 1000);
     return () => clearInterval(timer);
   }, [dateTime]);
 
   return (
-    <section id="countdown-section">
-      <div className="cd-card">
-        <p className="cd-quote">
-          A lifetime of togetherness begins with one sacred step
-        </p>
-        <span className="cd-script">Wedding</span>
+    <section id="countdown" aria-label="Countdown">
+      <div className="section-shell py-14 sm:py-20">
+        <div className="paper-card countdown-card reveal">
+          <span className="eyebrow">{eyebrow}</span>
+          <p className="script-text countdown-script">{script}</p>
+          <p className="countdown-quote mt-2">{quote}</p>
 
-        <div className="cd-grid">
           {time.done ? (
-            <p
-              style={{
-                gridColumn: "1/-1",
-                fontFamily: '"Great Vibes",cursive',
-                fontSize: "2.5rem",
-                color: "var(--sage-dark)",
-              }}
-            >
-              Waheguru Bless You! 🌸
-            </p>
+            <p className="countdown-done">{doneText}</p>
           ) : (
-            <>
-              <div className="cd-unit">
-                <span className="cd-num" id="cd-days">
-                  {time.days}
-                </span>
-                <span className="cd-lbl">Days</span>
+            <div className="countdown-grid">
+              <div className="countdown-unit">
+                <span className="countdown-num">{time.days}</span>
+                <span className="countdown-lbl">Days</span>
               </div>
-              <div className="cd-unit">
-                <span className="cd-num" id="cd-hours">
-                  {time.hours}
-                </span>
-                <span className="cd-lbl">Hours</span>
+              <div className="countdown-unit">
+                <span className="countdown-num">{time.hours}</span>
+                <span className="countdown-lbl">Hours</span>
               </div>
-              <div className="cd-unit">
-                <span className="cd-num" id="cd-mins">
-                  {time.mins}
-                </span>
-                <span className="cd-lbl">Mins</span>
+              <div className="countdown-unit">
+                <span className="countdown-num">{time.mins}</span>
+                <span className="countdown-lbl">Mins</span>
               </div>
-              <div className="cd-unit">
-                <span className="cd-num" id="cd-secs">
-                  {time.secs}
-                </span>
-                <span className="cd-lbl">Secs</span>
+              <div className="countdown-unit">
+                <span className="countdown-num">{time.secs}</span>
+                <span className="countdown-lbl">Secs</span>
               </div>
-            </>
+            </div>
           )}
+
+          <div className="ornament-rule mt-8">
+            <span>❀</span>
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
-export default Countdown;

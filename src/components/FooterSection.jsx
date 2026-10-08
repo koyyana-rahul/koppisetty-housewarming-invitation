@@ -1,44 +1,35 @@
-function FooterSection({ footer }) {
+import { Diya, Mandala } from "./Motifs";
+
+export default function FooterSection({ footer }) {
   return (
-    <section id="footer-section">
-      <div className="tc reveal">
-        <span
-          style={{
-            fontSize: "2.2rem",
-            display: "block",
-            marginBottom: "1rem",
-            opacity: 0.75,
-          }}
-        >
-          {footer.symbol}
-        </span>
+    <footer id="footer" aria-label="Closing blessings">
+      <div className="footer-inner text-center reveal">
+        <Mandala className="footer-mandala" petals={18} />
 
-        <p className="footer-msg">
-          {footer.message.split("\n").map((line, idx) => (
-            <span key={`${line}-${idx}`}>
-              {line}
-              <br />
-            </span>
-          ))}
+        <Diya className="footer-diya" />
+
+        <p className="footer-msg">{footer.message}</p>
+        {footer.messageTe ? (
+          <p className="footer-msg te mt-2">{footer.messageTe}</p>
+        ) : null}
+
+        <p className="footer-signoff">{footer.signoff}</p>
+        {footer.signoffTe ? (
+          <p className="footer-signoff te">{footer.signoffTe}</p>
+        ) : null}
+
+        <span className="footer-name">{footer.familyName}</span>
+        {footer.familyNameTe ? (
+          <span className="footer-name-te">{footer.familyNameTe}</span>
+        ) : null}
+
+        <p className="footer-sanskrit">{footer.sanskrit}</p>
+
+        <p className="footer-credit">
+          {footer.creditPrefix} <span className="icon">{footer.creditIcon}</span>{" "}
+          {footer.creditText}
         </p>
-
-        <span className="footer-name">{footer.couple}</span>
-
-        <div className="footer-credit" style={{ marginTop: "3.5rem" }}>
-          {footer.creditPrefix}{" "}
-          <span style={{ color: "#e74c3c" }}>{footer.creditHeart}</span>{" "}
-          {footer.creditBy}{" "}
-          {footer.creditLink ? (
-            <a href={footer.creditLink} target="_blank" rel="noreferrer">
-              {footer.creditText}
-            </a>
-          ) : (
-            footer.creditText
-          )}
-        </div>
       </div>
-    </section>
+    </footer>
   );
 }
-
-export default FooterSection;
