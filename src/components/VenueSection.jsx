@@ -1,7 +1,29 @@
 import { LocationIcon, MapPinIcon } from "./Motifs";
 
-export default function VenueSection({ venue, share }) {
-  const shareHref = `https://wa.me/?text=${encodeURIComponent(share)}`;
+function buildShareText(familyName, ceremony, venue) {
+  /* schedule[0] is the ceremony itself, already stated on the first line */
+  const programme = ceremony.schedule
+    .slice(1)
+    .map((item) => `${item.titleTe} — ${item.day}, ${item.time}`)
+    .join("\n");
+
+  return [
+    `🪔 *${familyName} — ${ceremony.nameTe} ${ceremony.sanskrit}*`,
+    "",
+    `${ceremony.nameTe}: ${ceremony.date}, ${ceremony.time}`,
+    `${ceremony.name}: ${ceremony.date}, ${ceremony.time}`,
+    programme,
+    "",
+    `${venue.address.join(", ")}.`,
+    "",
+    venue.mapUrl,
+  ].join("\n");
+}
+
+export default function VenueSection({ venue, ceremony, familyName }) {
+  const shareHref = `https://wa.me/?text=${encodeURIComponent(
+    buildShareText(familyName, ceremony, venue),
+  )}`;
 
   return (
     <section

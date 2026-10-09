@@ -12,8 +12,8 @@ export default function SectionHeading({
   return (
     <div className={`${alignment} ${className}`}>
       {label ? <span className="eyebrow">{label}</span> : null}
-      {title ? <h2 className="section-title mt-3">{title}</h2> : null}
-      {titleTe ? <p className="te te-heading mt-2">{titleTe}</p> : null}
+      {titleTe ? <h2 className="section-title te mt-3">{titleTe}</h2> : null}
+      {title ? <h3 className="section-title mt-3">{title}</h3> : null}
       {intro ? <p className="lede mt-4">{intro}</p> : null}
       {introTe ? <p className="lede te te-sm mt-2">{introTe}</p> : null}
     </div>

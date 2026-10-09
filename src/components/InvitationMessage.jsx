@@ -26,11 +26,13 @@ export default function InvitationMessage({ message }) {
         </div>
 
         <div className="message-body">
-          {message.paragraphs.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)}>{paragraph}</p>
-          ))}
           {message.paragraphsTe?.map((paragraph) => (
-            <p key={paragraph.slice(0, 20)} className="te mt-3">
+            <p key={paragraph.slice(0, 20)} className="te">
+              {paragraph}
+            </p>
+          ))}
+          {message.paragraphs.map((paragraph) => (
+            <p key={paragraph.slice(0, 24)} className={message.paragraphsTe?.length ? "mt-4" : ""}>
               {paragraph}
             </p>
           ))}
@@ -41,9 +43,6 @@ export default function InvitationMessage({ message }) {
         </div>
 
         <p className="message-closing">{message.closingLine}</p>
-        {message.closingLineTe ? (
-          <p className="message-closing te mt-1">{message.closingLineTe}</p>
-        ) : null}
       </article>
     </section>
   );

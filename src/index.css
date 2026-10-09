@@ -663,14 +663,6 @@
   }
 }
 
-.hero-actions {
-  margin-top: 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-}
-
 .scroll-cue {
   position: absolute;
   bottom: 1.75rem;
@@ -808,10 +800,6 @@
   .hero-family {
     margin-top: 0.8rem;
     font-size: clamp(1.8rem, 6vw, 2.4rem);
-  }
-
-  .hero-actions {
-    margin-top: 1.1rem;
   }
 
   .scroll-cue {
@@ -1113,54 +1101,6 @@
   height: 16px;
   color: var(--color-terracotta-deep);
 }
-.also-grid {
-  display: grid;
-  gap: 1.25rem;
-  max-width: 46rem;
-  margin-inline: auto;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 620px) {
-  .also-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.also-card {
-  text-align: center;
-  padding: 2rem 1.5rem;
-  transition:
-    transform 0.4s ease,
-    box-shadow 0.4s ease;
-}
-
-.also-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-card);
-}
-
-.also-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.1rem, 3.2vw, 1.3rem);
-  color: var(--color-maroon);
-}
-
-.also-when {
-  margin-top: 0.5rem;
-  font-family: var(--font-sans);
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-terracotta-deep);
-}
-
-.also-note {
-  margin-top: 0.35rem;
-  font-size: 0.95rem;
-  font-style: italic;
-  color: var(--color-ink-mute);
-}
 
 /* ══════════════════════════════════════════════════════════════
    Ceremony timeline
@@ -1186,11 +1126,66 @@
   background: linear-gradient(
     180deg,
     transparent,
-    var(--color-gold) 8%,
-    var(--color-gold) 92%,
+    rgba(194, 168, 120, 0.35) 8%,
+    rgba(194, 168, 120, 0.35) 92%,
     transparent
   );
-  opacity: 0.7;
+}
+
+/* The drawn portion — grows to the last revealed dot */
+.tl-line-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top center;
+  transform: scaleY(var(--tl-progress, 0));
+  background: linear-gradient(
+    180deg,
+    rgba(194, 168, 120, 0.2),
+    var(--color-gold) 12%,
+    var(--color-terracotta) 100%
+  );
+  box-shadow: 0 0 12px rgba(194, 168, 120, 0.55);
+  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* A soft bead of light travelling down the finished line */
+.tl-line-bead {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--tl-progress, 0) * 100%);
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow:
+    0 0 0 3px rgba(253, 247, 236, 0.85),
+    0 0 14px 3px rgba(240, 198, 127, 0.9);
+  opacity: 0;
+  transition:
+    top 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease 0.35s;
+}
+
+.tl-wrap:has(.tl-row.revealed) .tl-line-bead {
+  opacity: 1;
+  animation: tl-bead 2.6s ease-in-out infinite;
+}
+
+@keyframes tl-bead {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(253, 247, 236, 0.85),
+      0 0 10px 2px rgba(240, 198, 127, 0.75);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(253, 247, 236, 0.85),
+      0 0 18px 5px rgba(240, 198, 127, 1);
+  }
 }
 
 .tl-row {
@@ -1252,6 +1247,20 @@
   box-shadow: 0 0 0 3px rgba(194, 168, 120, 0.5);
 }
 
+/* Each dot lights up as the line reaches it */
+.tl-row:not(.revealed) .tl-dot {
+  opacity: 0.45;
+  transform: translate(-50%, -50%) scale(0.82);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tl-row.revealed .tl-dot {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 .tl-content.tl-highlight {
   border-color: var(--color-gold);
   background: rgba(255, 250, 240, 0.97);
@@ -1281,6 +1290,14 @@
   display: block;
   margin-top: 4px;
   font-size: 0.98rem;
+}
+
+.tl-note {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--color-ink-mute);
 }
 
 .tl-time {
@@ -1335,90 +1352,6 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   Rituals / shubh labh
-   ══════════════════════════════════════════════════════════════ */
-#rituals {
-  background:
-    radial-gradient(
-      circle at 15% 12%,
-      rgba(85, 112, 90, 0.12) 0%,
-      transparent 42%
-    ),
-    linear-gradient(180deg, rgba(253, 247, 236, 0.4) 0%, rgba(239, 224, 198, 0.7) 100%);
-}
-
-.rituals-grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: 1fr;
-  max-width: 62rem;
-  margin: 2.5rem auto 0;
-}
-
-@media (min-width: 560px) {
-  .rituals-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 960px) {
-  .rituals-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.ritual-card {
-  padding: 1.75rem 1.5rem;
-  text-align: center;
-  transition:
-    transform 0.4s ease,
-    box-shadow 0.4s ease;
-}
-
-.ritual-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-card);
-}
-
-.ritual-icon {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 1rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--color-terracotta-deep);
-  background: radial-gradient(
-    circle at 34% 28%,
-    rgba(240, 198, 127, 0.75),
-    rgba(217, 139, 58, 0.35)
-  );
-  box-shadow:
-    0 10px 22px -12px rgba(194, 101, 63, 0.9),
-    inset 0 0 0 1px rgba(194, 168, 120, 0.6);
-}
-
-.ritual-icon-svg {
-  width: 26px;
-  height: 26px;
-  padding: 2px;
-}
-
-.ritual-title {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  color: var(--color-maroon);
-  margin-bottom: 0.5rem;
-}
-
-.ritual-desc {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--color-ink-soft);
-  font-style: italic;
-}
 /* ══════════════════════════════════════════════════════════════
    Venue
    ══════════════════════════════════════════════════════════════ */
@@ -1866,6 +1799,20 @@
   .tl-content {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  /* Draw the line in full, no travelling bead */
+  .tl-line-fill {
+    transform: scaleY(1) !important;
+  }
+
+  .tl-line-bead {
+    display: none !important;
+  }
+
+  .tl-dot {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) !important;
   }
 }
 

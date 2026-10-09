@@ -1,10 +1,28 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SectionHeading from "./SectionHeading";
 
-export default function CeremonyTimeline({ timeline }) {
+export default function CeremonyTimeline({ ceremony }) {
+  const wrapRef = useRef(null);
+  const [progress, setProgress] = useState(0);
+
+  /* Grow the line down to the furthest dot that has scrolled into view */
+  const syncProgress = useCallback(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
+    const reached = [...wrap.querySelectorAll(".tl-row.revealed")].reduce(
+      (furthest, row) => {
+        const offset = row.offsetTop + row.offsetHeight / 2;
+        return offset > furthest ? offset : furthest;
+      },
+      0,
+    );
+
+    setProgress(Math.min(reached / wrap.offsetHeight, 1));
+  }, []);
+
   useEffect(() => {
     const rows = document.querySelectorAll("#timeline-section .tl-row");
-
     if (rows.length === 0) return undefined;
 
     const observer = new IntersectionObserver(
@@ -13,6 +31,7 @@ export default function CeremonyTimeline({ timeline }) {
           if (entry.isIntersecting) {
             entry.target.classList.add("revealed");
             observer.unobserve(entry.target);
+            syncProgress();
           }
         });
       },
@@ -20,8 +39,12 @@ export default function CeremonyTimeline({ timeline }) {
     );
 
     rows.forEach((row) => observer.observe(row));
-    return () => observer.disconnect();
-  }, [timeline]);
+    window.addEventListener("resize", syncProgress);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncProgress);
+    };
+  }, [ceremony, syncProgress]);
 
   return (
     <section
@@ -30,44 +53,31 @@ export default function CeremonyTimeline({ timeline }) {
       aria-label="Ceremony schedule"
     >
       <SectionHeading
-        label={timeline.sectionLabel}
-        title={timeline.title}
+        label={ceremony.scheduleLabel}
+        titleTe={ceremony.scheduleTitleTe}
+        title={ceremony.scheduleTitle}
         className="reveal"
       />
 
-      <p className="lede mt-4 text-center">
-        {timeline.intro}{" "}
-        <strong className="font-semibold not-italic text-maroon">
-          {timeline.introHighlight}
-        </strong>
-        {timeline.introSuffix}
-      </p>
+      <div
+        className="tl-wrap"
+        ref={wrapRef}
+        style={{ "--tl-progress": progress }}
+      >
+        <div className="tl-line" aria-hidden="true">
+          <span className="tl-line-fill" />
+          <span className="tl-line-bead" />
+        </div>
 
-      <div className="tl-wrap">
-        <div className="tl-line" />
-        {timeline.items.map((item) => (
-          <div
-            className="tl-row"
-            key={`${item.time}-${item.title}`}
-          >
-            <div
-              className={`tl-dot ${item.dotClassName ?? ""}`}
-              style={item.dotStyle}
-            />
-            <div
-              className={`tl-content ${item.contentClassName ?? ""}`}
-              style={item.contentStyle}
-            >
+        {ceremony.schedule.map((item) => (
+          <div className="tl-row" key={`${item.time}-${item.title}`}>
+            <div className={`tl-dot ${item.highlight ? "gold" : ""}`} />
+            <div className={`tl-content ${item.highlight ? "tl-highlight" : ""}`}>
               {item.day ? <span className="tl-day">{item.day}</span> : null}
-              <span className="tl-time" style={item.timeStyle}>
-                {item.time}
-              </span>
-              <span className="tl-evt" style={item.titleStyle}>
-                {item.title}
-              </span>
-              {item.titleTe ? (
-                <span className="te tl-te">{item.titleTe}</span>
-              ) : null}
+              <span className="tl-time">{item.time}</span>
+              <span className="tl-evt">{item.title}</span>
+              {item.titleTe ? <span className="te tl-te">{item.titleTe}</span> : null}
+              {item.note ? <span className="tl-note">{item.note}</span> : null}
             </div>
           </div>
         ))}

@@ -54,12 +54,6 @@ export default function HeroSection({ hero, familyName, onCta }) {
         {hero.ledeTe ? <p className="hero-te-sm lede">{hero.ledeTe}</p> : null}
 
         <span className="hero-family">{familyName}</span>
-
-        <div className="hero-actions">
-          <button type="button" className="btn-primary" onClick={onCta}>
-            {hero.cta}
-          </button>
-        </div>
       </div>
 
       <button type="button" className="scroll-cue" onClick={onCta}>

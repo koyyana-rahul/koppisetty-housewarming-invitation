@@ -1,23 +1,26 @@
 import {
   CalendarIcon,
   ClockIcon,
-  Diya,
   HouseIcon,
   LocationIcon,
-  Om,
 } from "./Motifs";
 import SectionHeading from "./SectionHeading";
 
-const ICONS = {
-  house: HouseIcon,
-  calendar: CalendarIcon,
-  clock: ClockIcon,
-  location: LocationIcon,
-  om: Om,
-  diya: Diya,
-};
-
 export default function EventDetails({ ceremony }) {
+  const facts = [
+    { icon: "house", label: "Occasion", value: `${ceremony.name} · Housewarming` },
+    { icon: "calendar", label: "Date", value: ceremony.date },
+    { icon: "clock", label: "Time", value: ceremony.time },
+    { icon: "location", label: "Venue", value: ceremony.venueLine },
+  ];
+
+  const ICONS = {
+    house: HouseIcon,
+    calendar: CalendarIcon,
+    clock: ClockIcon,
+    location: LocationIcon,
+  };
+
   return (
     <section
       id="ceremony"
@@ -37,8 +40,8 @@ export default function EventDetails({ ceremony }) {
         ) : null}
 
         <div className="event-facts">
-          {ceremony.facts.map((fact) => {
-            const Icon = ICONS[fact.icon] ?? HouseIcon;
+          {facts.map((fact) => {
+            const Icon = ICONS[fact.icon];
             return (
               <div className="event-fact" key={fact.label}>
                 <span className="event-fact-icon">
@@ -55,33 +58,9 @@ export default function EventDetails({ ceremony }) {
 
         <p className="event-muhurat">
           <ClockIcon />
-          {ceremony.muhurat}
+          {ceremony.name} Muhurat · {ceremony.time}
         </p>
       </article>
-
-      {ceremony.also?.length ? (
-        <div className="also-grid mt-6">
-          {ceremony.also.map((item) => {
-            const Icon = ICONS[item.icon] ?? Om;
-            return (
-              <article
-                className="paper-card also-card reveal reveal-d2"
-                key={item.title}
-              >
-                <span className="ritual-icon">
-                  <Icon className="ritual-icon-svg" aria-hidden="true" />
-                </span>
-                <h3 className="also-title">{item.title}</h3>
-                {item.titleTe ? <p className="te te-sm">{item.titleTe}</p> : null}
-                <p className="also-when">
-                  {item.date} · {item.time}
-                </p>
-                {item.note ? <p className="also-note">{item.note}</p> : null}
-              </article>
-            );
-          })}
-        </div>
-      ) : null}
     </section>
   );
 }

@@ -11,7 +11,6 @@ import HeroSection from "./components/HeroSection";
 import HostSection from "./components/HostSection";
 import InvitationMessage from "./components/InvitationMessage";
 import PetalsCanvas from "./components/PetalsCanvas";
-import RitualsSection from "./components/RitualsSection";
 import ScratchDate from "./components/ScratchDate";
 import VenueSection from "./components/VenueSection";
 import { invitationData } from "./data/invitation";
@@ -118,8 +117,8 @@ function App() {
       <PetalsCanvas active={hasEntered} />
 
       {!hasEntered ? (
-        <EntryGate
-          gate={invitationData.gate}
+<EntryGate
+            gate={{ ...invitationData.gate, mantra: invitationData.ceremony.sanskrit }}
           onStart={() => setAudioStartSignal((value) => value + 1)}
           onEnter={() => setHasEntered(true)}
         />
@@ -133,7 +132,7 @@ function App() {
         />
 
         <ScratchDate
-          key={`${invitationData.id}-${invitationData.ceremony.dateTimeLocal}`}
+          key={`${invitationData.id}-${invitationData.ceremony.countdownIso}`}
           dateParts={invitationData.ceremony.dateParts}
           active={hasEntered}
           className="reveal"
@@ -149,21 +148,28 @@ function App() {
           eyebrow={invitationData.ceremony.countdownEyebrow}
           script={invitationData.ceremony.countdownScript}
           quote={invitationData.ceremony.countdownQuote}
-          doneText={invitationData.ceremony.countdownDone}
+          doneText={invitationData.ceremony.sanskrit}
         />
 
         <EventDetails ceremony={invitationData.ceremony} />
 
-        <CeremonyTimeline timeline={invitationData.timeline} />
-
-        <RitualsSection rituals={invitationData.rituals} />
+        <CeremonyTimeline
+          key={invitationData.id}
+          ceremony={invitationData.ceremony}
+        />
 
         <VenueSection
           venue={invitationData.venue}
-          share={invitationData.venue.share}
+          ceremony={invitationData.ceremony}
+          familyName={invitationData.family.familyName}
         />
 
-        <FooterSection footer={invitationData.footer} />
+        <FooterSection
+          footer={invitationData.footer}
+          familyName={invitationData.family.familyName}
+          familyNameTe={invitationData.family.familyNameTe}
+          sanskrit={invitationData.ceremony.sanskrit}
+        />
       </main>
     </>
   );

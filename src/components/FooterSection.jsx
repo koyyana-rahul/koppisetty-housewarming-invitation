@@ -1,6 +1,11 @@
 import { Diya, Mandala } from "./Motifs";
 
-export default function FooterSection({ footer }) {
+export default function FooterSection({
+  footer,
+  familyName,
+  familyNameTe,
+  sanskrit,
+}) {
   return (
     <footer id="footer" aria-label="Closing blessings">
       <div className="footer-inner text-center reveal">
@@ -18,12 +23,12 @@ export default function FooterSection({ footer }) {
           <p className="footer-signoff te">{footer.signoffTe}</p>
         ) : null}
 
-        <span className="footer-name">{footer.familyName}</span>
-        {footer.familyNameTe ? (
-          <span className="footer-name-te">{footer.familyNameTe}</span>
+        <span className="footer-name">{familyName}</span>
+        {familyNameTe ? (
+          <span className="footer-name-te">{familyNameTe}</span>
         ) : null}
 
-        <p className="footer-sanskrit">{footer.sanskrit}</p>
+        <p className="footer-sanskrit">{sanskrit}</p>
 
         <p className="footer-credit">
           {footer.creditPrefix} <span className="icon">{footer.creditIcon}</span>{" "}

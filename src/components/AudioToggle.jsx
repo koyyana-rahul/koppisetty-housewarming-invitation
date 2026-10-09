@@ -6,6 +6,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *  • Otherwise a very soft WebAudio ambience (low drone + occasional bell)
  *    is synthesised, so the invitation ships without any audio asset.
  */
+const MIME_TYPES = {
+  mp3: "audio/mpeg",
+  m4a: "audio/mp4",
+  aac: "audio/aac",
+  wav: "audio/wav",
+  ogg: "audio/ogg",
+};
+
+function audioMimeType(src) {
+  const ext = src.split(".").pop()?.toLowerCase();
+  return MIME_TYPES[ext] ?? "";
+}
+
 function AudioToggle({ audioSrc = "", ambience = false, startSignal = 0 }) {
   const audioRef = useRef(null);
   const ctxRef = useRef(null);
@@ -155,7 +168,7 @@ function AudioToggle({ audioSrc = "", ambience = false, startSignal = 0 }) {
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
         >
-          <source src={audioSrc} type="audio/mpeg" />
+          <source src={audioSrc} type={audioMimeType(audioSrc)} />
         </audio>
       ) : null}
 
