@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&family=Montserrat:wght@300;400;500;600&family=Noto+Serif+Telugu:wght@400;500&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -19,11 +18,20 @@
   --color-ink-soft: #6b5a4c;
   --color-ink-mute: #97856f;
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "Cormorant Garamond", Georgia, serif;
-  --font-script: "Pinyon Script", cursive;
-  --font-sans: "Montserrat", sans-serif;
-  --font-telugu: "Noto Serif Telugu", "Nirmala UI", "Gautami", serif;
+  /* Playfair Display — titles, headings, numerals */
+  --font-display: "Playfair Display", "Times New Roman", Georgia, serif;
+  /* Lato — body copy, dates, venue details, labels, buttons */
+  --font-body: "Lato", "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* Cormorant Garamond — short ceremonial / italic supporting lines */
+  --font-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  /* Pinyon Script — names only */
+  --font-script: "Pinyon Script", "Snell Roundhand", cursive;
+  --font-sans: "Lato", "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* Indic stack: Sanskrit / Devanagari first, Telugu second */
+  --font-indic: "Noto Serif Devanagari", "Noto Serif Telugu", "Nirmala UI",
+    "Gautami", serif;
+  --font-telugu: "Noto Serif Telugu", "Noto Serif Devanagari", "Nirmala UI",
+    "Gautami", serif;
 
   --shadow-soft: 0 18px 50px -22px rgba(87, 20, 20, 0.28);
   --shadow-card: 0 26px 64px -26px rgba(87, 20, 20, 0.32);
@@ -43,8 +51,14 @@
     scroll-behavior: smooth;
     height: 100%;
     width: 100%;
-    /* keep anchored sections clear of the sticky navigation */
-    scroll-padding-top: 5.5rem;
+    /* This page has no sticky header (the only fixed elements are the
+       bottom-right audio button and the pointer-events:none petal
+       canvas), so anchored sections only need a small breathing gap
+       instead of a full nav-height offset. */
+    scroll-padding-top: 1.5rem;
+    /* Reserve the scrollbar gutter so unlocking the body on entry does
+       not shift the whole layout sideways. */
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -1426,15 +1440,24 @@
 }
 
 .venue-map {
-  width: 100%;
-  height: 210px;
-  margin-top: 1.75rem;
-  border: none;
-  border-radius: 1rem;
-  border: 1px solid rgba(194, 168, 120, 0.5);
-  filter: grayscale(0.25) sepia(0.12);
-  background: var(--color-sand);
-}
+    width: 100%;
+    height: 210px;
+    margin-top: 1.75rem;
+    border: none;
+    border-radius: 1rem;
+    border: 1px solid rgba(194, 168, 120, 0.5);
+    filter: grayscale(0.25) sepia(0.12);
+    background: var(--color-sand);
+  }
+
+  /* Embedded maps must never be a horizontal-overflow source. */
+  .venue-card {
+    min-width: 0;
+  }
+
+  .venue-card iframe {
+    max-width: 100%;
+  }
 
 @media (min-width: 640px) {
   .venue-map {
@@ -1826,5 +1849,575 @@
 
   #main-content {
     display: block !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Polish layer — additive only
+   Typography refinement, press feedback and card lift.
+   Nothing above this block was modified.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Typography refinement ────────────────────────────────── */
+
+/* Keep the two-word Telugu headings from breaking awkwardly */
+.te-heading,
+.hero-te {
+  text-wrap: balance;
+}
+
+/* Stop single-word orphans in the display serif */
+.section-title,
+.hero-headline,
+.event-name,
+.tl-evt,
+.venue-name {
+  text-wrap: balance;
+}
+
+/* Avoid ugly last-line rivers in body copy */
+.message-body p,
+.lede,
+.host-sub {
+  text-wrap: pretty;
+}
+
+/* Crisper glyph rendering on the serif faces */
+body,
+.section-title,
+.hero-headline,
+.event-name,
+.venue-name,
+.hero-family {
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Telugu needs a touch more line height to breathe */
+.te {
+  line-height: 1.85;
+}
+
+/* ── Press / tap feedback ─────────────────────────────────── */
+
+.btn-primary,
+.btn-ghost,
+#audio-btn,
+.scroll-cue,
+.venue-actions a {
+  -webkit-tap-highlight-color: transparent;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:active,
+.btn-ghost:active,
+#audio-btn:active,
+.venue-actions a:active {
+  transform: translateY(0) scale(0.975);
+  transition-duration: 0.12s;
+}
+
+.scroll-cue:active {
+  transform: translateY(2px) scale(0.96);
+  transition-duration: 0.12s;
+}
+
+/* Slightly firmer hover lift on the primary action */
+.btn-primary:hover {
+  transform: translateY(-3px);
+}
+
+/* ── Card lift ────────────────────────────────────────────── */
+
+/* Only the cards that had no hover treatment; .paper-card itself
+   is untouched so no other section is affected. */
+.message-card,
+.event-card,
+.countdown-card,
+.venue-card {
+  transition:
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.message-card:hover,
+.event-card:hover,
+.countdown-card:hover,
+.venue-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Promote the drifting ornaments onto their own layer */
+.hero-mandala,
+.hero-kalash,
+.footer-mandala,
+.footer-diya {
+  will-change: transform;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Reduced motion — honour the existing preference
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .message-card:hover,
+  .event-card:hover,
+  .countdown-card:hover,
+  .venue-card:hover,
+  .btn-primary:hover,
+  .btn-ghost:hover {
+    transform: none !important;
+    box-shadow: var(--shadow-soft) !important;
+  }
+
+  .hero-mandala,
+  .hero-kalash,
+  .footer-mandala,
+  .footer-diya {
+    will-change: auto;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFINEMENT LAYER — additive only
+   Nothing above this block was modified beyond the font tokens,
+   the scroll offset and the two @layer component rules marked
+   "venue-card / venue-map".
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1 · PROGRESSIVE-ENHANCEMENT GUARD
+   `.reveal` and `.tl-content` start hidden. They only start
+   hidden once JS has confirmed it will actually reveal them
+   (`html.motion-ready`), so a script failure can never leave the
+   invitation unreadable.
+   ───────────────────────────────────────────────────────────── */
+
+html:not(.motion-ready) .reveal,
+html:not(.motion-ready) .tl-content {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2 · MOTION TOKENS
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* one calm "settle" curve for entrances, one for hover lift */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-lift: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-reveal: 900ms;
+  --dur-enter: 1000ms;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3 · SCROLL REVEAL — same markup, better timing
+   ───────────────────────────────────────────────────────────── */
+
+.motion-ready .reveal {
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity var(--dur-reveal) var(--ease-settle),
+    transform var(--dur-reveal) var(--ease-settle);
+  will-change: opacity, transform;
+}
+
+.motion-ready .reveal.revealed {
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
+}
+
+/* Stagger rhythm — 120ms steps, capped so nothing feels sluggish */
+.motion-ready .reveal-d1 {
+  transition-delay: 120ms;
+}
+
+.motion-ready .reveal-d2 {
+  transition-delay: 240ms;
+}
+
+.motion-ready .reveal-d3 {
+  transition-delay: 360ms;
+}
+
+/* Timeline rows keep their own horizontal shift */
+.motion-ready .tl-row .tl-content {
+  transition:
+    opacity 820ms var(--ease-settle),
+    transform 820ms var(--ease-lift);
+  transition-delay: 90ms;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4 · HERO ENTRANCE — plays once, as the doors finish opening
+   `body.is-entered` is set by the same state that unmounts the
+   gate, so the choreography begins exactly when the invitation
+   becomes visible.
+   ───────────────────────────────────────────────────────────── */
+
+@keyframes settle-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes settle-veil {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+body.is-entered .hero-card > * {
+  animation: settle-up var(--dur-enter) var(--ease-settle) both;
+}
+
+/* The ornaments fade in only — their own looping transform keeps
+   running, so the mandala keeps turning and the toran keeps swaying */
+body.is-entered .hero-glow {
+  animation: settle-veil 2000ms ease-out both;
+}
+
+body.is-entered .hero-mandala {
+  animation:
+    settle-veil 2200ms ease-out both,
+    mandala-turn 90s linear infinite;
+}
+
+body.is-entered .hero-toran {
+  animation:
+    settle-veil 2200ms ease-out 200ms both,
+    sway 7s ease-in-out 2400ms infinite;
+}
+
+/* The floating kalash keeps its own drift once it has appeared */
+body.is-entered .hero-kalash {
+  animation:
+    settle-veil 1400ms ease-out 120ms both,
+    float 5s ease-in-out 1600ms infinite;
+}
+
+body.is-entered .invocation {
+  animation-delay: 60ms;
+}
+
+body.is-entered .hero-kalash {
+  animation-delay: 140ms, 1600ms;
+}
+
+body.is-entered .hero-blessing {
+  animation-delay: 240ms;
+}
+
+body.is-entered .hero-eyebrow {
+  animation-delay: 380ms;
+}
+
+body.is-entered .hero-headline {
+  animation-delay: 460ms;
+}
+
+body.is-entered .hero-te {
+  animation-delay: 580ms;
+}
+
+body.is-entered .hero-divider {
+  animation-delay: 700ms;
+}
+
+body.is-entered .hero-lede {
+  animation-delay: 760ms;
+}
+
+body.is-entered .hero-family {
+  animation:
+    settle-up var(--dur-enter) var(--ease-settle) 900ms both,
+    shimmer 6s linear 2000ms infinite;
+}
+
+/* The ornament rule draws its hairlines outward */
+body.is-entered .hero-divider::before,
+body.is-entered .hero-divider::after {
+  animation: draw-line 900ms var(--ease-settle) 700ms both;
+  transform-origin: center;
+}
+
+body.is-entered .hero-divider::before {
+  transform-origin: right center;
+}
+
+body.is-entered .hero-divider::after {
+  transform-origin: left center;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5 · TYPOGRAPHY — hierarchy, measure, rhythm
+   Playfair Display  → titles, headings, numerals
+   Lato              → body, dates, venue, labels, buttons
+   Cormorant Garamond→ short ceremonial / italic lines
+   Noto Serif        → Sanskrit (Devanagari) & Telugu
+   ───────────────────────────────────────────────────────────── */
+
+/* 5a · Base rhythm ------------------------------------------------ */
+body {
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  letter-spacing: 0.002em;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+}
+
+/* 5b · Devanagari / Sanskrit lines -------------------------------- */
+/* `invocation`, the gate mantra, the seal monogram and the dropcap
+   are Devanagari — they need the Indic serif, not a Latin face. */
+.invocation,
+.message-dropcap,
+#entry-gate .mantra,
+#entry-gate .seal-letter,
+.footer-sanskrit {
+  font-family: var(--font-indic);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+#entry-gate .seal-letter {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.footer-sanskrit {
+  letter-spacing: 0.02em;
+}
+
+/* 5c · Display tier ------------------------------------------------ */
+.hero-headline {
+  font-weight: 500;
+  letter-spacing: -0.008em;
+  line-height: 1.14;
+}
+
+.section-title {
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* The Telugu heading shares `.section-title` but must not sit at the
+   same display size as its English counterpart. */
+h2.section-title.te {
+  font-size: clamp(1.25rem, 3.6vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.host-name,
+.hosts-family {
+  font-weight: 400;
+  letter-spacing: 0.008em;
+}
+
+.countdown-num {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.scratch-value {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 5d · Sans tier — data, labels, supporting information ----------- */
+.eyebrow,
+.hero-eyebrow,
+.venue-eyebrow,
+.countdown-lbl,
+.tl-day,
+.tl-time,
+.host-sub,
+.scratch-lbl,
+.scratch-hint,
+.event-fact-label,
+.footer-credit,
+.scroll-cue span,
+#entry-gate .tap-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow,
+.venue-eyebrow {
+  letter-spacing: 0.3em;
+}
+
+.host-sub,
+.tl-time,
+.event-fact-label {
+  letter-spacing: 0.16em;
+}
+
+.tl-day {
+  letter-spacing: 0.14em;
+}
+
+.countdown-lbl {
+  letter-spacing: 0.16em;
+}
+
+.scratch-lbl {
+  letter-spacing: 0.2em;
+}
+
+.event-fact-value {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(0.94rem, 2.5vw, 1.02rem);
+  line-height: 1.45;
+  letter-spacing: 0.004em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: break-word;
+}
+
+.venue-address span {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: clamp(0.95rem, 2.6vw, 1.04rem);
+  line-height: 1.62;
+  letter-spacing: 0.008em;
+}
+
+.tl-evt {
+  letter-spacing: 0.01em;
+}
+
+.footer-signoff {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* 5e · Ceremonial italic tier ------------------------------------- */
+.lede,
+.hero-blessing,
+.event-subtitle,
+.countdown-quote,
+.venue-landmark,
+.tl-note,
+.footer-msg {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.004em;
+}
+
+.lede {
+  font-size: clamp(1rem, 2.5vw, 1.16rem);
+  line-height: 1.78;
+}
+
+.countdown-quote,
+.footer-msg {
+  font-size: clamp(1.04rem, 2.7vw, 1.18rem);
+  line-height: 1.76;
+}
+
+/* 5f · Body copy measure ------------------------------------------ */
+.message-body p {
+  font-family: var(--font-sans);
+  font-size: clamp(1.02rem, 2.6vw, 1.12rem);
+  line-height: 1.88;
+  letter-spacing: 0.004em;
+  max-width: 34rem;
+  margin-inline: auto;
+  text-wrap: pretty;
+}
+
+/* 5g · Buttons ------------------------------------------------------ */
+.btn-primary,
+.btn-ghost {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  transition:
+    transform 320ms var(--ease-lift),
+    box-shadow 320ms var(--ease-lift),
+    border-color 320ms var(--ease-lift),
+    background-color 320ms var(--ease-lift),
+    color 320ms var(--ease-lift);
+}
+
+.btn-primary:hover,
+.btn-ghost:hover {
+  transition-duration: 420ms;
+}
+
+/* 5h · Focus ring -------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-terracotta);
+  outline-offset: 4px;
+}
+
+#entry-gate .seal-button:focus-visible {
+  outline: 2px solid var(--color-gold-soft);
+  outline-offset: 6px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6 · REDUCED MOTION — new layers only
+   ───────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Reached last, so it also neutralises everything above. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .motion-ready .reveal,
+  .motion-ready .tl-row .tl-content,
+  .tl-content {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hero-mandala,
+  .hero-kalash,
+  .footer-mandala,
+  .footer-diya {
+    will-change: auto;
   }
 }

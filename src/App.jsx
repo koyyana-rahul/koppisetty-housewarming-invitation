@@ -69,15 +69,28 @@ function App() {
 
   const scrollTo = useCallback((target) => {
     document.getElementById(target)?.scrollIntoView({
-      behavior: "smooth",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
       block: "start",
     });
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = hasEntered ? "auto" : "hidden";
+    /* Only the inline axis is touched, so the stylesheet's
+       `overflow-x: hidden` on <body> stays in force and no horizontal
+       scrollbar can ever appear. */
+    document.body.style.overflowY = hasEntered ? "auto" : "hidden";
+    /* Two class hooks the stylesheet uses for motion only — they never
+       change behaviour, and `motion-ready` is what allows the reveal
+       animations to hide anything in the first place. Without it the
+       content simply stays visible. */
+    document.body.classList.toggle("is-entered", hasEntered);
+    document.documentElement.classList.toggle("motion-ready", hasEntered);
+
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflowY = "auto";
+      document.body.classList.remove("is-entered");
     };
   }, [hasEntered]);
 
