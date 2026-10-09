@@ -129,13 +129,14 @@ function App() {
 
       <PetalsCanvas active={hasEntered} />
 
-      {!hasEntered ? (
-<EntryGate
-            gate={{ ...invitationData.gate, mantra: invitationData.ceremony.sanskrit }}
-          onStart={() => setAudioStartSignal((value) => value + 1)}
-          onEnter={() => setHasEntered(true)}
-        />
-      ) : null}
+      {/* The gate manages its own removal: `onEnter` starts the page
+          entrance, but the gate stays mounted until its dissolve has
+          finished, so the two overlap instead of cutting each other off. */}
+      <EntryGate
+        gate={{ ...invitationData.gate, mantra: invitationData.ceremony.sanskrit }}
+        onStart={() => setAudioStartSignal((value) => value + 1)}
+        onEnter={() => setHasEntered(true)}
+      />
 
       <main id="main-content">
         <HeroSection

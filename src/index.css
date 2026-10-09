@@ -322,14 +322,36 @@
 
 /* ══════════════════════════════════════════════════════════════
    Entry gate — sacred doors that open on tap
+   ──────────────────────────────────────────────────────────────
+   `--gate-doors` is the single source of truth for how long the
+   doors take; it mirrors `DOORS_MS` in EntryGate.jsx, which is what
+   hands the page over at the moment they finish. Keep the two in step.
    ══════════════════════════════════════════════════════════════ */
+
+:root {
+  --gate-doors: 1150ms;
+  /* A door's weight: slow to break loose, then decisive */
+  --ease-gate: cubic-bezier(0.62, 0.02, 0.2, 1);
+}
+
 #entry-gate {
   position: fixed;
   inset: 0;
   z-index: 9999;
   background: var(--color-maroon-deep);
   overflow: hidden;
-  transition: opacity 1s ease;
+  /* The maroon field clears only once the doors have real momentum and
+     the card beneath has begun to arrive, so the opening reveals the
+     invitation rather than an empty lit rectangle. */
+  transition:
+    background-color 700ms ease 320ms,
+    opacity 560ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Once the doors are moving, the backdrop is no longer needed — the
+   leaves themselves carry the colour. */
+#entry-gate.is-open {
+  background-color: transparent;
 }
 
 #entry-gate .scene {
@@ -378,8 +400,12 @@
       transparent 55%
     ),
     linear-gradient(160deg, #7a1f1f 0%, #4a1010 60%, #3a0c0c 100%);
-  transition: transform 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--gate-doors) var(--ease-gate);
   z-index: 11;
+  /* Past 90° we would otherwise be looking at the mirrored back of the
+     door; hiding the backface lets each leaf simply leave the frame. */
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 #entry-gate .left-gate {
@@ -392,6 +418,43 @@
   right: 0;
   transform-origin: right;
   border-left: 1px solid rgba(227, 211, 173, 0.28);
+}
+
+/* A warm seam that widens as the doors part, so the opening reads as
+   light coming in rather than two panels sliding apart. It sits above
+   the leaves, but stays narrow and is gone before the doors finish,
+   so it never becomes a veil over the card behind it. */
+#entry-gate .scene::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  margin-left: -1px;
+  z-index: 14;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(240, 214, 158, 0.6) 50%,
+    transparent
+  );
+  filter: blur(8px);
+  opacity: 0;
+  transition:
+    width var(--gate-doors) var(--ease-gate),
+    opacity 260ms ease;
+}
+
+#entry-gate .open .scene::after {
+  width: 13%;
+  opacity: 1;
+}
+
+/* Cleared with the rest of the gate's glow as the doors finish. */
+#entry-gate.fade-out .scene::after {
+  opacity: 0;
 }
 
 #entry-gate .mantra {
@@ -416,7 +479,14 @@
   z-index: 20;
 }
 
+/* The idle drift lives on a wrapper, so it can never overwrite the
+   button's own transform when the doors open. */
+#entry-gate .seal-float {
+  animation: float 4.5s ease-in-out infinite;
+}
+
 #entry-gate .seal-button {
+  position: relative;
   width: clamp(112px, 30vw, 148px);
   height: clamp(112px, 30vw, 148px);
   border-radius: 50%;
@@ -432,12 +502,39 @@
   border: none;
   outline: none;
   cursor: pointer;
-  animation: float 4.5s ease-in-out infinite;
-  transition: transform 0.4s ease;
+  transition:
+    opacity 420ms ease,
+    transform 520ms var(--ease-gate);
 }
 
 #entry-gate .seal-button:hover {
   transform: scale(1.04);
+}
+
+/* A single pulse that expands and dies as the doors begin to part */
+#entry-gate .seal-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-gold-soft);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#entry-gate .open .seal-ring {
+  animation: seal-pulse 900ms var(--ease-gate) forwards;
+}
+
+@keyframes seal-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
 }
 
 #entry-gate .seal-inner-ring {
@@ -466,23 +563,61 @@
 }
 
 #entry-gate .open .left-gate {
-  transform: rotateY(-112deg);
+  transform: rotateY(-118deg);
 }
 
 #entry-gate .open .right-gate {
-  transform: rotateY(112deg);
+  transform: rotateY(118deg);
 }
 
+/* The seal recedes into the light rather than blinking out. It leaves
+   early and quickly, so the card behind it is never veiled. */
 #entry-gate .open .seal-button {
   opacity: 0;
-  transform: scale(0.6);
+  transform: scale(0.5);
   pointer-events: none;
+  transition:
+    opacity 300ms ease,
+    transform 620ms var(--ease-gate);
+}
+
+#entry-gate .open .seal-float {
+  animation: none;
 }
 
 #entry-gate .open .line-group,
 #entry-gate .open .mantra {
   opacity: 0;
-  transition: opacity 0.8s ease;
+  transition: opacity 520ms ease;
+}
+
+/* Warm bloom at the seam as the doors open. Kept narrow so it lights
+   the opening without tinting the card behind it, and gone well before
+   the hero needs a clean backdrop. */
+#entry-gate .mantra-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34vmin;
+  height: 78vmin;
+  transform: translate(-50%, -50%);
+  z-index: 13;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(240, 214, 158, 0.3) 0%,
+    transparent 62%
+  );
+  transition: opacity 600ms ease;
+}
+
+#entry-gate .open .mantra-glow {
+  opacity: 1;
+}
+
+#entry-gate.fade-out .mantra-glow {
+  opacity: 0;
 }
 
 #entry-gate.fade-out {
@@ -691,7 +826,8 @@
   border: none;
   cursor: pointer;
   opacity: 0;
-  animation: fade-in 1.4s ease 1.2s both;
+  /* Timing comes from `body.is-entered .scroll-cue`, so the cue can
+     never light up before the doors have opened. */
 }
 
 .scroll-cue span {
@@ -1124,24 +1260,29 @@
 }
 
 .tl-wrap {
-  max-width: 44rem;
-  margin: 3rem auto 0;
+  /* Card width and the gap to the spine are declared once, so the
+     connector stubs can never drift across the cards. */
+  --tl-card-w: 44%;
+  max-width: 46rem;
+  margin: clamp(2.5rem, 6vw, 3.5rem) auto 0;
   position: relative;
   padding-block: 0.5rem;
 }
+
+/* ── The spine ─────────────────────────────────────────────────── */
 
 .tl-line {
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
-  width: 2px;
-  transform: translateX(-50%);
+  width: 1px;
+  margin-left: -0.5px;
   background: linear-gradient(
     180deg,
     transparent,
-    rgba(194, 168, 120, 0.35) 8%,
-    rgba(194, 168, 120, 0.35) 92%,
+    rgba(194, 168, 120, 0.32) 6%,
+    rgba(194, 168, 120, 0.32) 94%,
     transparent
   );
 }
@@ -1154,215 +1295,424 @@
   transform: scaleY(var(--tl-progress, 0));
   background: linear-gradient(
     180deg,
-    rgba(194, 168, 120, 0.2),
-    var(--color-gold) 12%,
+    rgba(194, 168, 120, 0.3),
+    var(--color-gold) 10%,
     var(--color-terracotta) 100%
   );
-  box-shadow: 0 0 12px rgba(194, 168, 120, 0.55);
-  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(194, 168, 120, 0.5);
+  transition: transform 1.15s var(--ease-lift);
 }
 
-/* A soft bead of light travelling down the finished line */
+/* A soft bead of light resting at the drawing head */
 .tl-line-bead {
   position: absolute;
   left: 50%;
   top: calc(var(--tl-progress, 0) * 100%);
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
-  margin-top: -4px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  margin-top: -3.5px;
   border-radius: 50%;
-  background: var(--color-gold);
+  background: var(--color-gold-soft);
   box-shadow:
-    0 0 0 3px rgba(253, 247, 236, 0.85),
-    0 0 14px 3px rgba(240, 198, 127, 0.9);
+    0 0 0 3px rgba(253, 247, 236, 0.8),
+    0 0 12px 3px rgba(240, 198, 127, 0.85);
   opacity: 0;
   transition:
-    top 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.5s ease 0.35s;
+    top 1.15s var(--ease-lift),
+    opacity 0.45s ease 0.4s;
 }
 
-.tl-wrap:has(.tl-row.revealed) .tl-line-bead {
+.tl-wrap:has(.tl-row.is-revealed) .tl-line-bead {
   opacity: 1;
-  animation: tl-bead 2.6s ease-in-out infinite;
+  animation: tl-bead 2.8s ease-in-out infinite;
 }
 
 @keyframes tl-bead {
   0%,
   100% {
     box-shadow:
-      0 0 0 3px rgba(253, 247, 236, 0.85),
-      0 0 10px 2px rgba(240, 198, 127, 0.75);
+      0 0 0 3px rgba(253, 247, 236, 0.8),
+      0 0 9px 2px rgba(240, 198, 127, 0.65);
   }
 
   50% {
     box-shadow:
-      0 0 0 3px rgba(253, 247, 236, 0.85),
+      0 0 0 3px rgba(253, 247, 236, 0.8),
       0 0 18px 5px rgba(240, 198, 127, 1);
   }
 }
 
+/* ── Date banners ──────────────────────────────────────────────── */
+
+.tl-group + .tl-group {
+  margin-top: 2.75rem;
+}
+
+.tl-dayhead {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.tl-day {
+  position: relative;
+  z-index: 3;
+  display: inline-block;
+  padding: 0.42rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 168, 120, 0.5);
+  background: var(--color-ivory);
+  font-family: var(--font-sans);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-ink-soft);
+  box-shadow: 0 0 0 5px var(--color-ivory);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.7s var(--ease-settle),
+    transform 0.7s var(--ease-lift);
+}
+
+.tl-dayhead.is-revealed .tl-day {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Rows ──────────────────────────────────────────────────────── */
+
 .tl-row {
   position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
 }
 
 .tl-row:last-child {
   margin-bottom: 0;
 }
 
-.tl-row:nth-child(even) {
+.tl-row[data-side="right"] {
   flex-direction: row-reverse;
 }
 
+/* The connector stub: exactly the gap between the spine and the card,
+   measured from `--tl-card-w`, so it can never overrun the card. */
+.tl-row::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  width: calc(50% - var(--tl-card-w));
+  background: linear-gradient(
+    90deg,
+    rgba(194, 168, 120, 0.75),
+    rgba(194, 168, 120, 0.12)
+  );
+  transform-origin: left center;
+  scale: 0 1;
+  transition: scale 0.75s var(--ease-lift) 0.18s;
+}
+
+.tl-row[data-side="left"]::after {
+  right: 50%;
+}
+
+.tl-row[data-side="right"]::after {
+  left: 50%;
+  background: linear-gradient(
+    270deg,
+    rgba(194, 168, 120, 0.75),
+    rgba(194, 168, 120, 0.12)
+  );
+  transform-origin: right center;
+}
+
+.tl-row.is-revealed::after {
+  scale: 1 1;
+}
+
+/* ── Card ──────────────────────────────────────────────────────── */
+
 .tl-content {
-  width: 46%;
-  padding: 1.15rem 1.35rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(194, 168, 120, 0.55);
-  background: rgba(253, 247, 236, 0.92);
+  position: relative;
+  width: var(--tl-card-w);
+  padding: 1.15rem 1.35rem 1.2rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(194, 168, 120, 0.5);
+  background: linear-gradient(
+    180deg,
+    rgba(253, 247, 236, 0.97),
+    rgba(250, 242, 228, 0.94)
+  );
   box-shadow: var(--shadow-soft);
   opacity: 0;
-  transform: translateX(var(--tl-shift, -18px));
+  transform: translate3d(var(--tl-shift, -22px), 0, 0);
   transition:
-    opacity 0.9s ease,
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.85s var(--ease-settle)
+      calc(var(--tl-i, 0) * 110ms + 120ms),
+    transform 0.85s var(--ease-lift)
+      calc(var(--tl-i, 0) * 110ms + 120ms),
+    box-shadow 0.45s ease,
+    border-color 0.45s ease;
 }
 
-.tl-row.revealed .tl-content {
+.tl-row.is-revealed .tl-content {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
 }
 
-.tl-row:nth-child(even) .tl-content {
-  --tl-shift: 18px;
+.tl-row[data-side="left"] .tl-content {
+  --tl-shift: -22px;
+}
+
+.tl-row[data-side="right"] .tl-content {
+  --tl-shift: 22px;
   text-align: right;
 }
+
+/* A thin accent edge on the spine-facing side of the card */
+.tl-content::before {
+  content: "";
+  position: absolute;
+  top: 14%;
+  bottom: 14%;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--color-terracotta),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.7s ease 0.4s;
+}
+
+.tl-row[data-side="left"] .tl-content::before {
+  right: -1px;
+}
+
+.tl-row[data-side="right"] .tl-content::before {
+  left: -1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--color-terracotta),
+    transparent
+  );
+}
+
+.tl-row.is-revealed .tl-content::before {
+  opacity: 0.8;
+}
+
+@media (hover: hover) {
+  .tl-row.is-revealed .tl-content:hover {
+    box-shadow: var(--shadow-card);
+    border-color: rgba(194, 168, 120, 0.85);
+    transform: translate3d(0, -3px, 0);
+  }
+}
+
+/* ── Marker ────────────────────────────────────────────────────── */
 
 .tl-dot {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
   border-radius: 50%;
   background: var(--color-terracotta);
-  border: 3px solid var(--color-ivory);
-  box-shadow: 0 0 0 3px rgba(194, 101, 63, 0.35);
+  border: 2px solid var(--color-ivory);
+  box-shadow: 0 0 0 1px rgba(194, 101, 63, 0.45);
   z-index: 2;
-}
-
-.tl-dot.gold {
-  background: var(--color-gold);
-  box-shadow: 0 0 0 3px rgba(194, 168, 120, 0.5);
-}
-
-/* Each dot lights up as the line reaches it */
-.tl-row:not(.revealed) .tl-dot {
-  opacity: 0.45;
-  transform: translate(-50%, -50%) scale(0.82);
+  opacity: 0.4;
+  transform: scale(0.75);
   transition:
     opacity 0.6s ease,
-    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.6s var(--ease-lift),
+    box-shadow 0.6s ease;
 }
 
-.tl-row.revealed .tl-dot {
+.tl-row.is-revealed .tl-dot {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+  transform: scale(1);
 }
 
-.tl-content.tl-highlight {
-  border-color: var(--color-gold);
-  background: rgba(255, 250, 240, 0.97);
-  box-shadow: var(--shadow-card);
+/* The key ceremony gets a halo rather than a different colour */
+.tl-row.is-key .tl-dot {
+  background: var(--color-gold);
+  box-shadow:
+    0 0 0 1px rgba(194, 168, 120, 0.6),
+    0 0 0 5px rgba(194, 168, 120, 0.16);
 }
 
-.tl-content.tl-highlight .tl-time,
-.tl-content.tl-highlight .tl-evt {
-  color: var(--color-maroon);
+.tl-row.is-key.is-revealed .tl-dot {
+  box-shadow:
+    0 0 0 1px rgba(194, 168, 120, 0.8),
+    0 0 0 5px rgba(194, 168, 120, 0.22),
+    0 0 14px 2px rgba(240, 198, 127, 0.55);
 }
 
-.tl-content.tl-highlight .tl-evt {
-  font-size: clamp(1.5rem, 4vw, 1.9rem);
+/* ── Card contents ─────────────────────────────────────────────── */
+
+.tl-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.5rem;
+}
+
+.tl-row[data-side="right"] .tl-meta {
+  justify-content: flex-end;
+}
+
+.tl-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.55rem;
+  height: 1.55rem;
+  padding-inline: 0.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 168, 120, 0.55);
+  background: rgba(194, 168, 120, 0.12);
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-gold-deep);
 }
 
 .tl-day {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: 0.5rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-ink-mute);
-  margin-bottom: 3px;
+  letter-spacing: 0.14em;
 }
 
 .tl-te {
-  display: block;
-  margin-top: 4px;
+  margin-top: 0.3rem;
   font-size: 0.98rem;
 }
 
 .tl-note {
-  display: block;
-  margin-top: 4px;
+  margin-top: 0.4rem;
   font-size: 0.9rem;
   font-style: italic;
   color: var(--color-ink-mute);
 }
 
 .tl-time {
-  display: block;
   font-family: var(--font-sans);
-  font-size: 0.62rem;
+  font-size: 0.66rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
   color: var(--color-terracotta-deep);
-  margin-bottom: 5px;
 }
 
 .tl-evt {
-  display: block;
   font-family: var(--font-script);
   font-size: clamp(1.35rem, 3.6vw, 1.7rem);
   line-height: 1.25;
   color: var(--color-maroon);
 }
 
+/* ── The key ceremony card ─────────────────────────────────────── */
+
+.tl-content.tl-highlight {
+  border-color: rgba(194, 168, 120, 0.9);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 251, 242, 0.99),
+    rgba(252, 243, 226, 0.96)
+  );
+  box-shadow: var(--shadow-card);
+}
+
+.tl-content.tl-highlight::before {
+  background: linear-gradient(180deg, transparent, var(--color-gold), transparent);
+  width: 3px;
+}
+
+.tl-row.is-revealed .tl-content.tl-highlight::before {
+  opacity: 1;
+}
+
+.tl-content.tl-highlight .tl-evt {
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+}
+
+/* ── Narrow: single column, spine moves to the left ────────────── */
+
 @media (max-width: 560px) {
   .tl-line {
-    left: 15px;
-    transform: none;
+    left: 13px;
+    margin-left: 0;
   }
 
   .tl-row,
-  .tl-row:nth-child(even) {
+  .tl-row[data-side="right"] {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0;
+    padding-left: 2.6rem;
+    margin-bottom: 1.5rem;
   }
 
   .tl-content,
-  .tl-row:nth-child(even) .tl-content {
+  .tl-row[data-side="left"] .tl-content,
+  .tl-row[data-side="right"] .tl-content {
+    width: 100%;
     --tl-shift: 0px;
-    width: calc(100% - 2.5rem);
-    margin-left: 2.5rem;
     text-align: left;
-    transform: translateY(14px);
+    transform: translate3d(0, 16px, 0);
   }
 
-  .tl-row.revealed .tl-content {
-    transform: translateY(0);
+  .tl-row.is-revealed .tl-content {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .tl-row[data-side="right"] .tl-meta {
+    justify-content: flex-start;
+  }
+
+  .tl-content::before {
+    display: none;
+  }
+
+  /* Stubs now run from the left spine into the card */
+  .tl-row::after,
+  .tl-row[data-side="left"]::after,
+  .tl-row[data-side="right"]::after {
+    left: 13px;
+    right: auto;
+    width: 1.9rem;
+    background: linear-gradient(
+      90deg,
+      rgba(194, 168, 120, 0.75),
+      rgba(194, 168, 120, 0.12)
+    );
+    transform-origin: left center;
   }
 
   .tl-dot {
-    left: 15px;
-    top: 1.85rem;
-    transform: translate(-50%, -50%);
+    left: 13px;
+    top: 1.9rem;
+  }
+
+  .tl-day {
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    padding-inline: 0.85rem;
   }
 }
 
@@ -1819,7 +2169,8 @@
   }
 
   .reveal,
-  .tl-content {
+  .tl-content,
+  .tl-day {
     opacity: 1 !important;
     transform: none !important;
   }
@@ -1833,9 +2184,19 @@
     display: none !important;
   }
 
+  /* Dots are centred with margins, so `transform: none` is correct here */
   .tl-dot {
     opacity: 1 !important;
-    transform: translate(-50%, -50%) !important;
+    transform: scale(1) !important;
+  }
+
+  /* Connector stubs are already drawn */
+  .tl-row::after {
+    scale: 1 1 !important;
+  }
+
+  .tl-content::before {
+    opacity: 0.8 !important;
   }
 }
 
@@ -1988,14 +2349,15 @@ body,
 
 /* ─────────────────────────────────────────────────────────────
    1 · PROGRESSIVE-ENHANCEMENT GUARD
-   `.reveal` and `.tl-content` start hidden. They only start
-   hidden once JS has confirmed it will actually reveal them
+   `.reveal`, `.tl-content` and `.tl-day` start hidden. They only
+   start hidden once JS has confirmed it will actually reveal them
    (`html.motion-ready`), so a script failure can never leave the
    invitation unreadable.
    ───────────────────────────────────────────────────────────── */
 
 html:not(.motion-ready) .reveal,
-html:not(.motion-ready) .tl-content {
+html:not(.motion-ready) .tl-content,
+html:not(.motion-ready) .tl-day {
   opacity: 1;
   transform: none;
 }
@@ -2042,19 +2404,24 @@ html:not(.motion-ready) .tl-content {
   transition-delay: 360ms;
 }
 
-/* Timeline rows keep their own horizontal shift */
+/* Timeline cards keep the staggered entrance defined in the timeline
+   block itself — re-declaring the transition here would wipe the
+   per-row `--tl-i` delay, so only the legacy delay hook is cleared. */
 .motion-ready .tl-row .tl-content {
+  transition-delay: calc(var(--tl-i, 0) * 110ms + 120ms);
+}
+
+.motion-ready .tl-day {
   transition:
-    opacity 820ms var(--ease-settle),
-    transform 820ms var(--ease-lift);
-  transition-delay: 90ms;
+    opacity 700ms var(--ease-settle),
+    transform 700ms var(--ease-lift);
 }
 
 /* ─────────────────────────────────────────────────────────────
    4 · HERO ENTRANCE — plays once, as the doors finish opening
-   `body.is-entered` is set by the same state that unmounts the
-   gate, so the choreography begins exactly when the invitation
-   becomes visible.
+   `body.is-entered` is set the moment the doors are open, while the
+   gate is still dissolving, so this choreography runs *underneath*
+   the dissolve and is never seen to start late.
    ───────────────────────────────────────────────────────────── */
 
 @keyframes settle-up {
@@ -2150,6 +2517,13 @@ body.is-entered .hero-divider {
 
 body.is-entered .hero-lede {
   animation-delay: 760ms;
+}
+
+/* The scroll cue waits until the eye has finished travelling down the
+   card, then arrives — it used to fire on its own timer from page load,
+   which meant it was already lit before the doors had even opened. */
+body.is-entered .scroll-cue {
+  animation: fade-in 900ms var(--ease-settle) 1500ms both;
 }
 
 body.is-entered .hero-family {
@@ -2409,7 +2783,8 @@ h2.section-title.te {
 
   .motion-ready .reveal,
   .motion-ready .tl-row .tl-content,
-  .tl-content {
+  .tl-content,
+  .tl-day {
     opacity: 1 !important;
     transform: none !important;
   }
