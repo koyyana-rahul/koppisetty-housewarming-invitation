@@ -14,6 +14,7 @@ import PetalsCanvas from "./components/PetalsCanvas";
 import ScratchDate from "./components/ScratchDate";
 import VenueSection from "./components/VenueSection";
 import { invitationData } from "./data/invitation";
+import useScrollFence from "./hooks/useScrollFence";
 
 function celebrate() {
   const colors = [
@@ -65,7 +66,13 @@ function celebrate() {
 
 function App() {
   const [hasEntered, setHasEntered] = useState(false);
+  const [dateRevealed, setDateRevealed] = useState(false);
   const [audioStartSignal, setAudioStartSignal] = useState(0);
+
+  /* The date is revealed by scratching, so the rest of the invitation
+     stays out of reach until it has been. Without this a single flick of
+     the wheel skips the reveal entirely. */
+  useScrollFence("#scratch-section", hasEntered && !dateRevealed);
 
   const scrollTo = useCallback((target) => {
     document.getElementById(target)?.scrollIntoView({
@@ -115,9 +122,18 @@ function App() {
   }, [hasEntered]);
 
   const onDateRevealed = useCallback(() => {
+    /* Released first: the fence lifts immediately on the final card, so
+       the page is free by the time the eye looks up from the reveal.
+
+       Deliberately no scroll here. The visitor is already parked at the
+       fence with the cards in front of them; jumping them on to the
+       invitation message leapt clean over the family section, which is
+       the one part of the invitation they had not been able to read yet.
+       Staying put lets the confetti play out and hands them the scroll
+       wheel, so every section is reached in order. */
+    setDateRevealed(true);
     celebrate();
-    window.setTimeout(() => scrollTo("invitation"), 2200);
-  }, [scrollTo]);
+  }, []);
 
   return (
     <>
@@ -142,7 +158,10 @@ function App() {
         <HeroSection
           hero={invitationData.hero}
           familyName={invitationData.family.familyName}
-          onCta={() => scrollTo("invitation")}
+          /* Leads to the reveal while the date is hidden, then only as far
+             as the family section — jumping to the invitation message
+             would skip over the hosts entirely. */
+          onCta={() => scrollTo(dateRevealed ? "hosts" : "scratch-section")}
         />
 
         <ScratchDate
