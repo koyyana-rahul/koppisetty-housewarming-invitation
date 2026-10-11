@@ -29,7 +29,7 @@ export const invitationData = {
     headlineTe: ["గృహ ప్రవేశ", "మహోత్సవం"],
     lede: "as we celebrate the beginning of a beautiful new chapter in our new home.",
     ledeTe:
-      "మా కొత్త ఇంటిలోకి మా జీవితంలోని ఒక అద్భుతమైన అధ్యాయం ప్రారంభమవుతోంది.",
+      "మా కొత్త ఇటిలోకి మా జీవితంలోని ఒక అద్భుతమైన అధ్యాయం ప్రారంభమవుతోంది.",
   },
 
   /* ── Hosts / family ─────────────────────────────────────── */
@@ -40,7 +40,7 @@ export const invitationData = {
     intro:
       "With love, gratitude and the blessings of our elders, we are delighted to invite you into our new home.",
     introTe:
-      "ప్రేమ, కృతజ్ఞత మరియు మా పెద్దల ఆశీస్సులతో మా కొత్త ఇంటికి మీకు సాదర ఆహ్వానం.",
+      "మా నూతన గృహంలోకి అడుగుపెడుతూ, మా జీవితంలో ఒక అందమైన, అద్భుతమైన కొత్త అధ్యాయానికి శ్రీకారం చుడుతున్నాము.",
     signoff: "We step into our new home",
     // signoffTe: "మా కొత్త ఇంటికి దాదాపు",
     hosts: [
@@ -65,7 +65,7 @@ export const invitationData = {
     headingTe: "మీకు సాదర ఆహ్వానం",
     heading: "You Are Cordially Invited",
     paragraphsTe: [
-      "భగవంతుని ఆశీస్సులు, మా కుటుంబ స్నేహంతో మా కొత్త ఇంటి గృహ ప్రవేశానికి మిమ్మల్ని ఆహ్వానిస్తున్నాము. మీ సన్నిధి, ఆశీస్సులు మా ఇంటికి శుభం తేవాలి.",
+      "మా కుటుంబ పెద్దల ఆశీస్సులతో, మా నూతన గృహప్రవేశ శుభకార్యానికి మిమ్మల్ని సాదరంగా ఆహ్వానిస్తున్నాము. ఈ శుభసందర్భంలో మీ రాక మా ఆనందాన్ని మరింత పెంచుతుంది. మీ విలువైన సమక్షం మాకు ఎంతో సంతోషాన్ని కలిగిస్తుంది. 🙏",
     ],
     paragraphs: [
       "With our family's blessings, we invite you to the Gruhapravesham of our new home. Your presence will bring us joy.",
