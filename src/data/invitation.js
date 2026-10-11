@@ -113,7 +113,7 @@ export const invitationData = {
       },
       {
         day: "Thursday, 15-10-2026",
-        time: "1:00 PM",
+        time: "12:00 PM",
         title: "Lunch",
         titleTe: "భోజనం",
         note: "At Our Home",
@@ -145,7 +145,7 @@ export const invitationData = {
     landmark: "Visakhapatnam, Andhra Pradesh",
     mapUrl: "https://goo.gl/maps/dsppWfw1yv9PR4Xs8?g_st=atm",
     mapEmbed:
-      "https://maps.google.com/maps?q=Sri+Sai+Ramya+Residency+6A+Road+Venkateswara+Colony+Sheelanagar+Gajuwaka+Visakhapatnam&output=embed",
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1950947.624832372!2d79.48925747866043!3d17.245713291149126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a3969bb6362b095%3A0xd95fa30fa0b8a768!2sVarma%20Logistics!5e0!3m2!1sen!2sin!4v1791734626698!5m2!1sen!2sin",
   },
 
   /* ── Closing / footer ───────────────────────────────────── */

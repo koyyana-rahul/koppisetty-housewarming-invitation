@@ -42,30 +42,42 @@ export default function VenueSection({ venue, ceremony, familyName }) {
           <p className="te te-heading mt-1">{venue.nameTe}</p>
         ) : null}
 
-        <p className="venue-address">
-          <LocationIcon />
-          <span>
-            {venue.address.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
+        {/* One block, one measure, one left edge. The English and the
+            Telugu used to be two independently-positioned elements, so on
+            a phone they sat at different x offsets with nothing tying
+            them together and read as unrelated paragraphs. */}
+        <div className="venue-addr">
+          <span className="venue-addr-pin" aria-hidden="true">
+            <LocationIcon />
           </span>
-        </p>
 
-        {venue.addressTe ? (
-          <p className="venue-address-te te te-sm">
-            {venue.addressTe.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </p>
-        ) : null}
+          <div className="venue-addr-body">
+            <address className="venue-address">
+              {venue.address.map((line) => (
+                <span key={line} className="venue-addr-line">
+                  {line}
+                </span>
+              ))}
+            </address>
 
-        {venue.landmark ? (
-          <p className="venue-landmark">{venue.landmark}</p>
-        ) : null}
+            {venue.addressTe ? (
+              <>
+                <span className="venue-addr-rule" aria-hidden="true" />
+                <p className="venue-address-te">
+                  {venue.addressTe.map((line) => (
+                    <span key={line} className="venue-addr-line">
+                      {line}
+                    </span>
+                  ))}
+                </p>
+              </>
+            ) : null}
+
+            {venue.landmark ? (
+              <p className="venue-landmark">{venue.landmark}</p>
+            ) : null}
+          </div>
+        </div>
 
         <iframe
           className="venue-map"

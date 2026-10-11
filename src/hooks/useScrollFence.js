@@ -77,9 +77,18 @@ export default function useScrollFence(targetSelector, locked) {
       return window.scrollY >= limit - 2;
     };
 
+    /* Cancelling a non-cancelable event does not stop the scroll — it
+       only logs an intervention warning. A gesture the compositor has
+       already committed to (a momentum fling on iOS, say) arrives this
+       way, so every refusal below checks first. The `scroll` listener
+       remains the real backstop, which is why it is not optional. */
+    const refuse = (event) => {
+      if (event.cancelable) event.preventDefault();
+    };
+
     const onWheel = (event) => {
       /* Downward intent at the fence is refused; upward is always free. */
-      if (event.deltaY > 0 && atLimit()) event.preventDefault();
+      if (event.deltaY > 0 && atLimit()) refuse(event);
     };
 
     let lastTouchY = null;
@@ -91,7 +100,7 @@ export default function useScrollFence(targetSelector, locked) {
       if (y == null || lastTouchY == null) return;
       const movingDown = y > lastTouchY;
       lastTouchY = y;
-      if (movingDown && atLimit()) event.preventDefault();
+      if (movingDown && atLimit()) refuse(event);
     };
     const onTouchEnd = () => {
       lastTouchY = null;
