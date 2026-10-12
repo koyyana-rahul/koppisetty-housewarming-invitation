@@ -1172,18 +1172,43 @@
   color: var(--color-gold-deep);
 }
 
+/* The column count follows the number of sons, not a fixed four. With
+   a fixed count a two-child family left half the row empty on a
+   desktop, which is what made this read as broken there. The widths
+   come from HostSection as custom properties so the row is always
+   full and never stretched wider than the cards need. */
 .hosts-sons-grid {
+  --gap: 1rem;
+  --track: 13rem;
+  --cols-narrow: 2;
+  --cols-wide: 2;
+
   margin-top: 1.5rem;
   display: grid;
-  gap: 1rem;
-  max-width: 52rem;
+  gap: var(--gap);
+  grid-template-columns: repeat(var(--cols-narrow), minmax(0, 1fr));
+  /* Narrow: the grid only needs to be as wide as its columns. */
+  max-width: calc(
+    var(--cols-narrow) * var(--track) + (var(--cols-narrow) - 1) * var(--gap)
+  );
   margin-inline: auto;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-@media (min-width: 900px) {
+@media (min-width: 640px) {
   .hosts-sons-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    --cols-narrow: var(--cols-wide);
+    max-width: calc(
+      var(--cols-wide) * var(--track) + (var(--cols-wide) - 1) * var(--gap)
+    );
+  }
+}
+
+/* Below this the two-column row squeezes a long name into a very narrow
+   card, so a single son per row reads better. */
+@media (max-width: 379px) {
+  .hosts-sons-grid {
+    --cols-narrow: 1;
+    --track: 11rem;
   }
 }
 

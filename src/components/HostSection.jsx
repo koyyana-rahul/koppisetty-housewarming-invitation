@@ -9,6 +9,13 @@ export default function HostSection({ family }) {
      scripts read as the same single unit rather than as two entries. */
   const coupleTe = couple?.people.map((person) => person.nameTe).filter(Boolean).join(" & ");
 
+  /* Column counts follow the number of sons: never a fixed four, which
+     left half the row empty for a two-child family on a desktop. A
+     single son is never left stranded in the left column. */
+  const sonCount = sons?.people.length ?? 0;
+  const colsWide = Math.min(Math.max(sonCount, 1), 4);
+  const colsNarrow = Math.min(Math.max(sonCount, 1), 2);
+
   return (
     <section
       id="hosts"
@@ -65,7 +72,10 @@ export default function HostSection({ family }) {
           {sons.label ? (
             <p className="hosts-sons-label reveal">{sons.label}</p>
           ) : null}
-          <div className="hosts-sons-grid">
+          <div
+            className="hosts-sons-grid"
+            style={{ "--cols-narrow": colsNarrow, "--cols-wide": colsWide }}
+          >
             {sons.people.map((person, index) => (
               <article
                 className={`paper-card host-card host-card-son reveal reveal-d${Math.min(index + 1, 3)}`}
