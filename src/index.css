@@ -1180,7 +1180,9 @@
 .hosts-sons-grid {
   --gap: 1rem;
   --track: 13rem;
-  --cols-narrow: 2;
+  /* Two per row on a phone, but never wider than two — a narrow screen
+     gives each card too little room for a full name. */
+  --cols-narrow: min(var(--cols-wide, 2), 2);
   --cols-wide: 2;
 
   margin-top: 1.5rem;
@@ -1228,7 +1230,23 @@
 .host-name-son,
 .host-name.host-name-son {
   font-size: clamp(1.05rem, 3.4vw, 1.28rem);
-  overflow-wrap: break-word;
+  /* Names wrap between words, never inside one. `break-word` was
+     splitting "Sriram" into "Sri" and "Ram" when the track was narrow,
+     which is not something a name may do. The grid track is
+     `minmax(0, 1fr)`, so a long name shrinks its own track rather than
+     pushing the row wider. */
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  text-wrap: balance;
+}
+
+/* Cards in a row match height whichever name is longer. */
+.host-card-son {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .host-ornament {

@@ -11,10 +11,14 @@ export default function HostSection({ family }) {
 
   /* Column counts follow the number of sons: never a fixed four, which
      left half the row empty for a two-child family on a desktop. A
-     single son is never left stranded in the left column. */
+     single son is never left stranded in the left column.
+
+     Only the wide count is handed to CSS. The narrow count is derived
+     there, so the very small screens that need one-per-row can still
+     override it — an inline custom property here would outrank any
+     media query. */
   const sonCount = sons?.people.length ?? 0;
   const colsWide = Math.min(Math.max(sonCount, 1), 4);
-  const colsNarrow = Math.min(Math.max(sonCount, 1), 2);
 
   return (
     <section
@@ -74,7 +78,7 @@ export default function HostSection({ family }) {
           ) : null}
           <div
             className="hosts-sons-grid"
-            style={{ "--cols-narrow": colsNarrow, "--cols-wide": colsWide }}
+            style={{ "--cols-wide": colsWide }}
           >
             {sons.people.map((person, index) => (
               <article
