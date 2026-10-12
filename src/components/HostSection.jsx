@@ -2,6 +2,13 @@ import { Om, Kalash } from "./Motifs";
 import SectionHeading from "./SectionHeading";
 
 export default function HostSection({ family }) {
+  const couple = family.hosts.find((group) => group.kind === "couple");
+  const sons = family.hosts.find((group) => group.kind === "sons");
+
+  /* The Telugu mirrors the Latin line: one line, both names, so the two
+     scripts read as the same single unit rather than as two entries. */
+  const coupleTe = couple?.people.map((person) => person.nameTe).filter(Boolean).join(" & ");
+
   return (
     <section
       id="hosts"
@@ -12,30 +19,68 @@ export default function HostSection({ family }) {
         label={family.sectionLabel}
         title={family.heading}
         titleTe={family.headingTe}
-        intro={family.intro[0]}
+        intro={family.intro}
         introTe={family.introTe}
         className="reveal"
       />
 
-      <div className="hosts-grid mt-10">
-        {family.hosts.map((host, index) => (
-          <article
-            className={`paper-card host-card reveal reveal-d${index + 1}`}
-            key={host.name}
-          >
-            {index === 0 ? (
-              <Kalash className="host-ornament" aria-hidden="true" />
-            ) : (
-              <Om className="host-ornament" aria-hidden="true" />
-            )}
-            <h3 className="host-name">{host.name}</h3>
-            {host.nameTe ? (
-              <p className="te te-sm mt-1">{host.nameTe}</p>
+      {/* Parents share one card and one name line. Stacking them as two
+          blocks with a rule between read as two separate people, which is
+          wrong for a couple — the names belong together. */}
+      {couple ? (
+        <div className="hosts-couple mt-10 reveal">
+          <article className="paper-card host-card host-card-couple">
+            <Kalash className="host-ornament" aria-hidden="true" />
+            {/* The surname is shared, so it is set once in bold above
+                the pair rather than repeated inside both names. */}
+            {couple.surname ? (
+              <p className="host-surname">{couple.surname}</p>
             ) : null}
-            <p className="host-sub">{host.sub}</p>
+            <h3 className="host-name host-name-couple">
+              {couple.people.map((person, index) => (
+                <span className="host-name-fragment" key={person.name}>
+                  {index > 0 ? (
+                    <span className="host-amp" aria-hidden="true">
+                      &amp;
+                    </span>
+                  ) : null}
+                  <span className="host-name-part">{person.name}</span>
+                </span>
+              ))}
+            </h3>
+            {couple.surnameTe ? (
+              <p className="te te-sm mt-2 host-surname-te">{couple.surnameTe}</p>
+            ) : null}
+            {coupleTe ? (
+              <p className="te te-sm mt-1 host-name-couple-te">{coupleTe}</p>
+            ) : null}
+            {couple.sub ? <p className="host-sub">{couple.sub}</p> : null}
           </article>
-        ))}
-      </div>
+        </div>
+      ) : null}
+
+      {/* Sons are named individually, below the parents. */}
+      {sons ? (
+        <div className="hosts-sons">
+          {sons.label ? (
+            <p className="hosts-sons-label reveal">{sons.label}</p>
+          ) : null}
+          <div className="hosts-sons-grid">
+            {sons.people.map((person, index) => (
+              <article
+                className={`paper-card host-card host-card-son reveal reveal-d${Math.min(index + 1, 3)}`}
+                key={person.name}
+              >
+                <Om className="host-ornament host-ornament-sm" aria-hidden="true" />
+                <h3 className="host-name host-name-son">{person.name}</h3>
+                {person.nameTe ? (
+                  <p className="te te-sm mt-1">{person.nameTe}</p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <div className="text-center reveal reveal-d3">
         <p className="hosts-signoff">{family.signoff}</p>

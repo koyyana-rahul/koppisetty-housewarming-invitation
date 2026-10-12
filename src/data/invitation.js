@@ -44,15 +44,37 @@ export const invitationData = {
     signoff: "We step into our new home",
     // signoffTe: "మా కొత్త ఇంటికి దాదాపు",
     hosts: [
+      /* The parents share one card. The surname is common to both, so it
+         is declared once and set in bold above them; repeating it inside
+         each name pushed the pair past the width of a phone and forced a
+         wrap that made them look like two separate people. */
       {
-        name: "Shri Koppisetty YesuBabu",
-        nameTe: "శ్రీ కొప్పిశెట్టి యేసుబాబు",
-        sub: "Shri & Smt. Koppisetty",
+        kind: "couple",
+        surname: "Koppisetty",
+        surnameTe: "కొప్పిశెట్టి",
+        people: [
+          {
+            name: "Shri YesuBabu",
+            nameTe: "శ్రీ యేసుబాబు",
+          },
+          {
+            name: "Smt. Kanaka Durga",
+            nameTe: "శ్రీమతి కనక దుర్గ",
+          },
+        ],
       },
       {
-        name: "Smt. Koppisetty Kanaka Durga",
-        nameTe: "శ్రీమతి కొప్పిశెట్టి కనక దుర్గ",
-        sub: "With the entire Koppisetty family",
+        kind: "sons",
+        label: "Their Sons",
+        people: [
+          { name: "Suraj", nameTe: "సురజ్" },
+          {
+            /* One person, not three — the full name is
+               "Manoj Venkat Sriram". */
+            name: "Manoj Venkat Sri Ram",
+            nameTe: "మనోజ్ వెంకట్ శ్రీ రామ్",
+          },
+        ],
       },
     ],
     familyName: "The Koppisetty Family",
@@ -143,9 +165,9 @@ export const invitationData = {
       "శీలనగర్, గజువాక",
     ],
     landmark: "Visakhapatnam, Andhra Pradesh",
-    mapUrl: "https://goo.gl/maps/dsppWfw1yv9PR4Xs8?g_st=atm",
+    mapUrl: "https://maps.app.goo.gl/YvcczsW1AjJ9Xzio6?g_st=iw",
     mapEmbed:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1950947.624832372!2d79.48925747866043!3d17.245713291149126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a3969bb6362b095%3A0xd95fa30fa0b8a768!2sVarma%20Logistics!5e0!3m2!1sen!2sin!4v1791734626698!5m2!1sen!2sin",
+      "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3800.5731372229993!2d83.19552977517253!3d17.71761398322692!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTfCsDQzJzAzLjQiTiA4M8KwMTEnNTMuMiJF!5e0!3m2!1sen!2sin!4v1791778923073!5m2!1sen!2sin",
   },
 
   /* ── Closing / footer ───────────────────────────────────── */

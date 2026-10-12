@@ -1087,6 +1087,125 @@
   box-shadow: var(--shadow-card);
 }
 
+/* ── Parents: one card, one name line ──────────────────────── */
+
+.hosts-couple {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.host-card-couple {
+  padding-block: clamp(2rem, 5vw, 2.75rem);
+}
+
+/* Wraps as a single phrase: the names sit on the same line, separated
+   only by the ampersand, and a line break can land there but nowhere
+   else — a couple's names are never broken up mid-name. */
+/* The shared surname, set in bold above the pair. Declared once here
+   rather than repeated inside both names, which is what let the two
+   names share a single line. */
+.host-surname {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--color-maroon);
+}
+
+.host-name-couple,
+.host-name.host-name-couple {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0 0.4rem;
+  /* The names no longer repeat the surname, so the pair fits one line
+     on a phone as well as on a desktop. The ampersand remains the only
+     place a break may land. */
+  font-size: clamp(1.05rem, 4.6vw, 1.45rem);
+  line-height: 1.45;
+  margin-top: 0.35rem;
+  text-wrap: balance;
+}
+
+/* Each name is never split — a break can only land at the ampersand. */
+.host-name-part {
+  white-space: nowrap;
+}
+
+.host-amp {
+  font-style: italic;
+  color: var(--color-gold-deep);
+  /* The ampersand is a flex item of its own, so it needs its own
+     breathing room on both sides — the row `gap` only separates it from
+     one of the names. */
+  margin-inline: 0.15rem;
+}
+
+.host-name-couple-te {
+  font-size: clamp(0.95rem, 4vw, 1.2rem);
+  line-height: 1.7;
+  text-wrap: balance;
+}
+
+/* The Telugu surname carries the same emphasis as its Latin form. */
+.host-surname-te {
+  font-weight: 600;
+  font-size: clamp(1rem, 4.4vw, 1.3rem);
+  color: var(--color-maroon);
+}
+
+/* ── Sons: individual cards ────────────────────────────────── */
+
+.hosts-sons {
+  margin-top: 2.75rem;
+}
+
+.hosts-sons-label {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+}
+
+.hosts-sons-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  max-width: 52rem;
+  margin-inline: auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .hosts-sons-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* A long name must never widen a track and break the row. */
+.host-card-son {
+  padding: clamp(1.4rem, 4vw, 1.9rem) 0.85rem;
+  min-width: 0;
+}
+
+.host-ornament-sm {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 0.7rem;
+  opacity: 0.75;
+}
+
+.host-name-son,
+.host-name.host-name-son {
+  font-size: clamp(1.05rem, 3.4vw, 1.28rem);
+  overflow-wrap: break-word;
+}
+
 .host-ornament {
   width: 46px;
   height: 46px;
